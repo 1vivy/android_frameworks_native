@@ -22,7 +22,9 @@ namespace android {
         // BufferQueue will keep track of at most this value of buffers.
         // Attempts at runtime to increase the number of buffers past this
         // will fail.
-        static constexpr int NUM_BUFFER_SLOTS = 64;
+        // Oplus camera requests more than 64 buffer slots; the stock 64 causes a
+        // black viewfinder. Bumped to 96 (pure capacity headroom, low risk).
+        static constexpr int NUM_BUFFER_SLOTS = 96;
 
         enum {
             // A flag returned by dequeueBuffer when the client needs to call
