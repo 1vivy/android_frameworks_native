@@ -761,6 +761,15 @@ bool AHardwareBuffer_formatIsYuv(uint32_t format) {
         case AHARDWAREBUFFER_FORMAT_YCbCr_422_I:
         case AHARDWAREBUFFER_FORMAT_YCbCr_P010:
         case AHARDWAREBUFFER_FORMAT_YCbCr_P210:
+        // qcom vendor format recognized by OOS libnativewindow (binary-verified: OOS
+        // AHardwareBuffer_lockPlanes routes 0x7FA30C0A -> lockAsyncYCbCr 3-plane fill).
+        // Stock AOSP returns false here, so the SAT/fusion P010_VENUS OUTPUT buffer takes
+        // the single-plane lockAsync path, leaving chroma planes[1]/[2] unset -> APS
+        // camApsBufferLockPlanes descriptor=0x0 -> BasicTone/ArcSoft walk off-buffer ->
+        // SIGSEGV. Recognizing it = OOS parity, born-correct descriptor, retires libapsfixup.
+        // See docs/re-notes/formatisyuv-p010-framework-root-RE.md. OOS recognizes ONLY this
+        // qcom format here (NOT the wider 12-format set), so we match OOS exactly.
+        case 0x7FA30C0A: // HAL_PIXEL_FORMAT_YCbCr_420_P010_VENUS
             return true;
         default:
             return false;
