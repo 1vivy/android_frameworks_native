@@ -634,6 +634,16 @@ public:
     // Returns the name of the connected consumer.
     virtual String8 getConsumerName() const = 0;
 
+    // --- Oplus/OnePlus IGraphicBufferProducer ABI extension (OOS libgui) ---
+    // Returns whether the connected consumer is controlled by an app. This is
+    // an OEM-added vtable slot present in OnePlus/Oplus OOS libgui (transaction
+    // code 38), inserted here between getConsumerName() and setSharedBufferMode()
+    // to preserve the exact IGraphicBufferProducer vtable layout that OEM
+    // prebuilts (e.g. libNativeWinBuffExchange) rely on via hardcoded vtable
+    // offsets. Recovered from the OOS Bp proxy log string
+    // "getConsumerControlledByApp failed to transact". Default no-op.
+    virtual bool getConsumerControlledByApp() const;
+
     // Used to enable/disable shared buffer mode.
     //
     // When shared buffer mode is enabled the first buffer that is queued or
@@ -714,6 +724,23 @@ public:
     // returned by querying the now deprecated
     // NATIVE_WINDOW_CONSUMER_USAGE_BITS attribute.
     virtual status_t getConsumerUsage(uint64_t* outUsage) const = 0;
+
+    // --- Oplus/OnePlus IGraphicBufferProducer ABI extension (OOS libgui) ---
+    // Six OEM-added vtable slots present in OnePlus/Oplus OOS libgui, inserted
+    // here between getConsumerUsage() and setAutoPrerotation() to preserve the
+    // exact IGraphicBufferProducer vtable layout that OEM prebuilts rely on via
+    // hardcoded vtable offsets. Declared in OOS Bp/Bn vtable order (which maps to
+    // OOS Binder transaction codes 39, 40, 42, 41, 43, 44 respectively).
+    // Signatures were reverse-engineered from the OOS Bp proxy Parcel I/O
+    // (writeBool/writeInt32 args, readInt32 replies); exact semantics are
+    // unconfirmed, so these are safe no-op stubs whose sole purpose is
+    // vtable-slot (ABI) parity, not functional behaviour.
+    virtual status_t oplusGbpSetExtension1(bool enable);   // OOS txn 39
+    virtual int32_t  oplusGbpGetExtension1();              // OOS txn 40
+    virtual status_t oplusGbpSetExtension2(int32_t value); // OOS txn 42
+    virtual int32_t  oplusGbpGetExtension2();              // OOS txn 41
+    virtual int32_t  oplusGbpGetExtension3();              // OOS txn 43
+    virtual status_t oplusGbpSetExtension3(int32_t value); // OOS txn 44
 
     // Enable/disable the auto prerotation at buffer allocation when the buffer
     // size is driven by the consumer.

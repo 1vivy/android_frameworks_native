@@ -1024,6 +1024,49 @@ status_t IGraphicBufferProducer::setFrameRate(float /*frameRate*/, int8_t /*comp
     return INVALID_OPERATION;
 }
 
+// --- Oplus/OnePlus IGraphicBufferProducer ABI-parity extension stubs ---
+// These occupy the OEM-added vtable slots present in OnePlus/Oplus OOS libgui
+// so that OEM prebuilts (e.g. libNativeWinBuffExchange) resolve their hardcoded
+// IGraphicBufferProducer vtable offsets to the correct slots. They are no-ops
+// for every IGBP other than BufferQueue; exact OEM behaviour is not reproduced.
+bool IGraphicBufferProducer::getConsumerControlledByApp() const {
+    // OOS libgui transaction code 38.
+    return false;
+}
+
+status_t IGraphicBufferProducer::oplusGbpSetExtension1(bool enable) {
+    // OOS libgui transaction code 39.
+    (void)enable;
+    return INVALID_OPERATION;
+}
+
+int32_t IGraphicBufferProducer::oplusGbpGetExtension1() {
+    // OOS libgui transaction code 40.
+    return 0;
+}
+
+status_t IGraphicBufferProducer::oplusGbpSetExtension2(int32_t value) {
+    // OOS libgui transaction code 42.
+    (void)value;
+    return INVALID_OPERATION;
+}
+
+int32_t IGraphicBufferProducer::oplusGbpGetExtension2() {
+    // OOS libgui transaction code 41.
+    return 0;
+}
+
+int32_t IGraphicBufferProducer::oplusGbpGetExtension3() {
+    // OOS libgui transaction code 43.
+    return 0;
+}
+
+status_t IGraphicBufferProducer::oplusGbpSetExtension3(int32_t value) {
+    // OOS libgui transaction code 44.
+    (void)value;
+    return INVALID_OPERATION;
+}
+
 #if COM_ANDROID_GRAPHICS_LIBGUI_FLAGS(BQ_EXTENDEDALLOCATE)
 status_t IGraphicBufferProducer::setAdditionalOptions(const std::vector<gui::AdditionalOptions>&) {
     // No-op for IGBP other than BufferQueue.
